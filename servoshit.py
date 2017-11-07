@@ -5,8 +5,8 @@
 import pigpio
 import time
 
-O = 1225
-C = 700
+O = 1175
+C = 650
 pos = C
 
 servoPin = 18    # this is GPIO18. Pin 12 on the board
@@ -39,8 +39,9 @@ def closeBox():
    # pi.stop()
 
 if __name__ == "__main__":
-    closeBox()
     openBox()
+    time.sleep(1)
+    closeBox()
 
 
 #

@@ -28,48 +28,52 @@ sendEmail.sendEmail("hellobox is running", "cool")
 #servoshit.closeBox()
 
 
-
+errors = 0
 cycles = 0
 prev_latest_email_id = 0
 while True:
+    try:
+        mail.select("inbox")
 
-    mail.select("inbox")
+        result, data = mail.search(None, "ALL")
 
-    result, data = mail.search(None, "ALL")
+        ids = data[0]  # data is a list
+        id_list = ids.split()  # ids is a space separated string
+        latest_email_id = id_list[-1]  # get the latest
+        print "latest = %s" % (latest_email_id),
+        # t = time.ctime()
+        # print " checked at %s" % t,
+        print " Cycles: %d" % cycles,
+        print " Errors: %d" % errors
 
-    ids = data[0]  # data is a list
-    id_list = ids.split()  # ids is a space separated string
-    latest_email_id = id_list[-1]  # get the latest
-    print "latest = %s" % (latest_email_id),
-    # t = time.ctime()
-    # print " checked at %s" % t,
-    print " Cycles: %d" % cycles,
+        if latest_email_id != prev_latest_email_id and cycles > 0:
+            #result, data = mail. fetch(latest_email_id, "(RFC822)")  # fetch email body for the given id
+            result, data = mail. fetch(latest_email_id, "(BODY[HEADER.FIELDS (SUBJECT)])")  # fetch email body for the given id
 
-    if latest_email_id != prev_latest_email_id and cycles > 0:
-        #result, data = mail. fetch(latest_email_id, "(RFC822)")  # fetch email body for the given id
-        result, data = mail. fetch(latest_email_id, "(BODY[HEADER.FIELDS (SUBJECT)])")  # fetch email body for the given id
+            subject = data[0][1]
+            #getting the subject line of the email
+            length = len(subject)
+            subject = subject[9:length]
 
-        subject = data[0][1]
-        #getting the subject line of the email
-        length = len(subject)
-        subject = subject[9:length]
-        
-        servoshit.openBox()
-        OLEDtext.display(subject)
-        print subject
-        buttons.buttons()
-        
-        servoshit.closeBox()
-        sleep(.5)
-        
-        
-        
-        
-      
-    elif latest_email_id == prev_latest_email_id:
-        print "No new mail"
+            servoshit.openBox()
+            OLEDtext.display(subject)
+            print subject
+            buttons.buttons()
 
-    prev_latest_email_id = latest_email_id
-    cycles += 1
+            servoshit.closeBox()
+            sleep(.5)
 
-    sleep(2)
+
+
+
+
+        elif latest_email_id == prev_latest_email_id:
+            print "No new mail"
+
+        prev_latest_email_id = latest_email_id
+        cycles += 1
+
+        sleep(5)
+    except():
+        errors += 1
+        sleep(15)
